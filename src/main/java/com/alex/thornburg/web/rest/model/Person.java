@@ -1,4 +1,4 @@
-package com.alex.thornburg.web.model;
+package com.alex.thornburg.web.rest.model;
 
 import javax.persistence.*;
 
@@ -14,6 +14,7 @@ public class Person {
     String firstName;
     String lastName;
     int age;
+    @OneToOne
     Sex sex;
     String email;
     String phoneNumber;

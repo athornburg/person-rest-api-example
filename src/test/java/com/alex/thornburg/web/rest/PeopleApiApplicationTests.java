@@ -1,8 +1,11 @@
 package com.alex.thornburg.web.rest;
 
-import com.alex.thornburg.web.model.Address;
-import com.alex.thornburg.web.model.Person;
-import com.alex.thornburg.web.repo.PersonRepo;
+import com.alex.thornburg.web.rest.model.Address;
+import com.alex.thornburg.web.rest.model.Person;
+import com.alex.thornburg.web.rest.repo.AddressRepository;
+import com.alex.thornburg.web.rest.repo.FamilyRepository;
+import com.alex.thornburg.web.rest.repo.PersonRepository;
+import com.alex.thornburg.web.rest.repo.SexRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,10 +23,13 @@ import org.springframework.web.context.WebApplicationContext;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import com.alex.thornburg.web.model.Sex;
+import com.alex.thornburg.web.rest.model.Sex;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -37,12 +43,25 @@ public class PeopleApiApplicationTests {
 	private MockMvc mockMvc;
 
 	private HttpMessageConverter mappingJackson2HttpMessageConverter;
+	Address alexsAddress;
+	Person alex;
+	Sex sex;
 
 	@Autowired
 	private WebApplicationContext webApplicationContext;
 
 	@Autowired
-	private PersonRepo personRepo;
+	private FamilyRepository familyRepository;
+
+	@Autowired
+	private AddressRepository addressRepository;
+
+	@Autowired
+	private SexRepository sexRepository;
+
+	@Autowired
+	private PersonRepository personRepository;
+
 
 	@Autowired
 	void setConverters(HttpMessageConverter<?>[] converters) {
@@ -57,15 +76,17 @@ public class PeopleApiApplicationTests {
 	@Before
 	public void setup() throws Exception {
 		this.mockMvc = webAppContextSetup(webApplicationContext).build();
-		this.personRepo.deleteAllInBatch();
+		this.personRepository.deleteAllInBatch();
+		alexsAddress = new Address("451 W Wrightwood","United States","Chicago",60614);
+		sex = new Sex(true,false);
+		alex=new Person("Alex","Thornburg",23,sex,"alexthornburg1@gmail.com","740-526-6225",alexsAddress);
 	}
 
 	@Test
 	public void createNewPerson(){
-		Address alexsAddress = new Address("451 W Wrightwood","United States","Chicago",60614);
 		try {
-			String payload = json(new Person("Alex","Thornburg",23,Sex.MALE,"alexthornburg1@gmail.com","740-526-6225",alexsAddress));
-			this.mockMvc.perform(post("/people/create")
+			String payload = json(alex);
+			this.mockMvc.perform(post("/person")
 					.contentType(contentType)
 					.content(payload))
 					.andExpect(status().isCreated());
@@ -77,7 +98,21 @@ public class PeopleApiApplicationTests {
 	}
 
 	@Test
-	public void contextLoads() {
+	public void readPerson(){
+		try {
+			sexRepository.save(sex);
+			addressRepository.save(alexsAddress);
+			personRepository.save(alex);
+			this.mockMvc.perform(get("/person/" + alex.getId()))
+			.andExpect(status().isOk())
+					.andExpect(content().contentType(contentType))
+					.andExpect(jsonPath("$[0].id", is(this.alex.getId())))
+					.andExpect(jsonPath("$[0].firstName", is(alex.getFirstName())))
+					.andExpect(jsonPath("$[0].lastName", is(alex.getLastName())))
+					.andExpect(jsonPath("$[0].age", is(alex.getAge())));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	protected String json(Object o) throws IOException {

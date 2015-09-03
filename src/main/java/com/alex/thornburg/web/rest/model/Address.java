@@ -1,14 +1,12 @@
-package com.alex.thornburg.web.model;
+package com.alex.thornburg.web.rest.model;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.List;
 
 /**
  * Created by alexthornburg on 8/31/15.
  */
+@Entity
 public class Address {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
