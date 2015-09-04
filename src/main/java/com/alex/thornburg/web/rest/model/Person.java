@@ -18,7 +18,7 @@ public class Person {
     Sex sex;
     String email;
     String phoneNumber;
-    @ManyToOne
+    @OneToOne
     Address address;
 
     protected Person() {}

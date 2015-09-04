@@ -14,9 +14,8 @@ public class Family {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
     private String surname;
-    private
     @OneToMany
-    List<Person> people;
+    private List<Person> people;
 
     public String getSurname() {
         return surname;

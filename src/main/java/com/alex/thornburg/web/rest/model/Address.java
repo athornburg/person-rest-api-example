@@ -11,8 +11,8 @@ public class Address {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
-    @OneToMany(mappedBy="address")
-    public List<Person> people;
+    @OneToOne
+    public Person person;
     private String streetAddress;
     private String country;
     private String city;
@@ -34,12 +34,12 @@ public class Address {
         this.id = id;
     }
 
-    public List<Person> getPeople() {
-        return people;
+    public Person getPeople() {
+        return person;
     }
 
-    public void setPeople(List<Person> people) {
-        this.people = people;
+    public void setPeople(Person person) {
+        this.person = person;
     }
 
     public String getStreetAddress() {
