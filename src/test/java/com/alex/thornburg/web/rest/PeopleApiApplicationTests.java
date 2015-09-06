@@ -138,14 +138,12 @@ public class PeopleApiApplicationTests {
 			sexRepository.save(sex);
 			addressRepository.save(alexsAddress);
 			personRepository.save(alex);
-			Person newEmail = alex;
-			newEmail.setEmail("someotheremail@gmail.com");
-			String payload = json(newEmail);
+			alex.setEmail("someotheremail@gmail.com");
+			String payload = json(alex);
 			this.mockMvc.perform(put("/person/"+alex.getId())
 					.contentType(contentType)
 					.content(payload));
-			Person output = personRepository.findById(newEmail.getId());
-			assertEquals(output.getEmail(), "someotheremail@gmail.com");
+			assertEquals(personRepository.findById(alex.getId()).getEmail(), "someotheremail@gmail.com");
 		}catch (Exception e){
 			e.printStackTrace();
 		}
