@@ -26,9 +26,12 @@ import java.util.Arrays;
 
 import com.alex.thornburg.web.rest.model.Sex;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -128,6 +131,39 @@ public class PeopleApiApplicationTests {
 			e.printStackTrace();
 		}
 	}
+
+	@Test
+	public void updatePerson(){
+		try{
+			sexRepository.save(sex);
+			addressRepository.save(alexsAddress);
+			personRepository.save(alex);
+			Person newEmail = alex;
+			newEmail.setEmail("someotheremail@gmail.com");
+			String payload = json(newEmail);
+			this.mockMvc.perform(put("/person/"+alex.getId())
+					.contentType(contentType)
+					.content(payload));
+			Person output = personRepository.findById(newEmail.getId());
+			assertEquals(output.getEmail(), "someotheremail@gmail.com");
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void deletePerson(){
+		try{
+			sexRepository.save(sex);
+			addressRepository.save(alexsAddress);
+			personRepository.save(alex);
+			this.mockMvc.perform(delete("/person/"+alex.getId())).andExpect(status().isOk());
+			assert(personRepository.findById(alex.getId())==null);
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+	}
+
 
 	protected String json(Object o) throws IOException {
 		MockHttpOutputMessage mockHttpOutputMessage = new MockHttpOutputMessage();

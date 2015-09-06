@@ -35,15 +35,36 @@ class PersonEndpointController {
         return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
     }
 
+    @RequestMapping(value = "/{personId}",method = RequestMethod.DELETE)
+    void deletePerson(@PathVariable long personId) {
+        personRepository.delete(personId);
+    }
+
     @RequestMapping(value = "/{personId}", method = RequestMethod.GET)
     Person getPerson(@PathVariable long personId) {
-        System.out.println("Person found: "+this.personRepository.findById(personId).getFirstName());
         return this.personRepository.findById(personId);
     }
+
+    @RequestMapping(value = "/{personId}",method = RequestMethod.PUT)
+    Person updatePerson(@RequestBody Person updatedPerson,@PathVariable long personId) {
+        Person old = personRepository.findById(personId);
+        old.setAddress(updatedPerson.getAddress());
+        old.setFirstName(updatedPerson.getFirstName());
+        old.setLastName(updatedPerson.getLastName());
+        old.setEmail(updatedPerson.getEmail());
+        old.setPhoneNumber(updatedPerson.getPhoneNumber());
+        old.setAge(updatedPerson.getAge());
+        old.setSex(updatedPerson.getSex());
+        personRepository.save(old);
+        return old;
+    }
+
     @RequestMapping(value = "/findByFirstName/{firstName}", method = RequestMethod.GET)
     Person getPerson(@PathVariable String firstName) {
         return this.personRepository.findByFirstName(firstName);
     }
+
+
 
 
 }
