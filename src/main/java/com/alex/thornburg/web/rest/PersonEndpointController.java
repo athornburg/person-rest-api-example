@@ -16,7 +16,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RequestMapping("/person")
 class PersonEndpointController {
 
-    private PersonRepository personRepository;
+    private com.alex.thornburg.web.rest.repo.PersonRepository personRepository;
 
     @Autowired
     PersonEndpointController(PersonRepository personRepository) {
@@ -37,6 +37,7 @@ class PersonEndpointController {
 
     @RequestMapping(value = "/{personId}", method = RequestMethod.GET)
     Person getPerson(@PathVariable long personId) {
+        System.out.println("Person found: "+this.personRepository.findById(personId).getFirstName());
         return this.personRepository.findById(personId);
     }
     @RequestMapping(value = "/findByFirstName/{firstName}", method = RequestMethod.GET)

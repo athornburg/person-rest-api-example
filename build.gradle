@@ -42,6 +42,7 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-data-rest")
     compile("org.apache.logging.log4j:log4j-core:2.3")
     runtime("com.h2database:h2")
+    compile('com.jayway.jsonpath:json-path:2.0.0')
     providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
     testCompile("org.springframework.boot:spring-boot-starter-test") 
 }

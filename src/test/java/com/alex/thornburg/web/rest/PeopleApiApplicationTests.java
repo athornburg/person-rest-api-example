@@ -23,9 +23,8 @@ import org.springframework.web.context.WebApplicationContext;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import com.alex.thornburg.web.rest.model.Sex;
 
-import static org.hamcrest.Matchers.hasSize;
+import com.alex.thornburg.web.rest.model.Sex;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -77,6 +76,8 @@ public class PeopleApiApplicationTests {
 	public void setup() throws Exception {
 		this.mockMvc = webAppContextSetup(webApplicationContext).build();
 		this.personRepository.deleteAllInBatch();
+		this.sexRepository.deleteAllInBatch();
+		addressRepository.deleteAllInBatch();
 		alexsAddress = new Address("451 W Wrightwood","United States","Chicago",60614);
 		sex = new Sex(true,false);
 		alex=new Person("Alex","Thornburg",23,sex,"alexthornburg1@gmail.com","740-526-6225",alexsAddress);
@@ -106,11 +107,24 @@ public class PeopleApiApplicationTests {
 			this.mockMvc.perform(get("/person/" + alex.getId()))
 			.andExpect(status().isOk())
 					.andExpect(content().contentType(contentType))
-					.andExpect(jsonPath("$[0].id", is(this.alex.getId())))
-					.andExpect(jsonPath("$[0].firstName", is(alex.getFirstName())))
-					.andExpect(jsonPath("$[0].lastName", is(alex.getLastName())))
-					.andExpect(jsonPath("$[0].age", is(alex.getAge())));
+					.andExpect(jsonPath("$.firstName", is(this.alex.getFirstName())))
+					.andExpect(jsonPath("$.lastName", is(this.alex.getLastName())))
+					.andExpect(jsonPath("$.age", is(this.alex.getAge())));
 		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void findPersonByFirstName(){
+		try{
+			sexRepository.save(sex);
+			addressRepository.save(alexsAddress);
+			personRepository.save(alex);
+			this.mockMvc.perform(get("/person/findByFirstName/" + alex.getFirstName()+"/"))
+					.andExpect(status().isOk())
+					.andExpect(jsonPath("$.firstName", is(alex.getFirstName())));
+		}catch (Exception e){
 			e.printStackTrace();
 		}
 	}
