@@ -9,4 +9,5 @@ import org.springframework.data.repository.query.Param;
  */
 public interface FamilyRepository extends JpaRepository<Family, Long> {
     Family findById(@Param("id")long id);
+    Family findBySurname(@Param("surname")String surname);
 }
