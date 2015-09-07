@@ -61,9 +61,14 @@ public class FamilyController {
         return newFam;
     }
 
-    @RequestMapping(value="findBySyrname/{surname}",method=RequestMethod.GET)
+    @RequestMapping(value="findBySurname/{surname}",method=RequestMethod.GET)
     Family getFam(@PathVariable String surname){
         return this.familyRepository.findBySurname(surname);
+    }
+
+    @RequestMapping(value="/{familyId}",method=RequestMethod.GET)
+    Family getFamById(@PathVariable long familyId){
+        return this.getFamById(familyId);
     }
 
 

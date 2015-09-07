@@ -14,12 +14,22 @@ public class Kinship {
     private Person origin;
     @OneToOne
     private Person relative;
-    private int dnaDifference;
+    private String relName;
+    private double dnaDifference;
 
-    public Kinship(Person origin,Person relative,int dnaDifference){
+    public Kinship(String relName,Person origin,Person relative,double dnaDifference){
         this.origin = origin;
         this.relative = relative;
         this.dnaDifference = dnaDifference;
+        this.relName = relName;
+    }
+
+    public String getRelName() {
+        return relName;
+    }
+
+    public void setRelName(String relName) {
+        this.relName = relName;
     }
 
     public long getId() {
@@ -46,11 +56,11 @@ public class Kinship {
         this.relative = relative;
     }
 
-    public int getDnaDifference() {
+    public double getDnaDifference() {
         return dnaDifference;
     }
 
-    public void setDnaDifference(int dnaDifference) {
+    public void setDnaDifference(double dnaDifference) {
         this.dnaDifference = dnaDifference;
     }
 }

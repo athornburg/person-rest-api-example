@@ -17,6 +17,11 @@ public class Family {
     @OneToMany
     private List<Person> people;
 
+    public Family(String surname,List<Person> people){
+        this.surname = surname;
+        this.people = people;
+    }
+
     public String getSurname() {
         return surname;
     }

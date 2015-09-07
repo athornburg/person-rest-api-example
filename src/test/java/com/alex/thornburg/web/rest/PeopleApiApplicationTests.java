@@ -1,11 +1,7 @@
 package com.alex.thornburg.web.rest;
 
-import com.alex.thornburg.web.rest.model.Address;
-import com.alex.thornburg.web.rest.model.Person;
-import com.alex.thornburg.web.rest.repo.AddressRepository;
-import com.alex.thornburg.web.rest.repo.FamilyRepository;
-import com.alex.thornburg.web.rest.repo.PersonRepository;
-import com.alex.thornburg.web.rest.repo.SexRepository;
+import com.alex.thornburg.web.rest.model.*;
+import com.alex.thornburg.web.rest.repo.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,9 +18,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
-import com.alex.thornburg.web.rest.model.Sex;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -45,9 +42,13 @@ public class PeopleApiApplicationTests {
 	private MockMvc mockMvc;
 
 	private HttpMessageConverter mappingJackson2HttpMessageConverter;
-	Address alexsAddress;
-	Person alex;
-	Sex sex;
+	private Address alexsAddress;
+	private Address anotherAddress;
+	private Person alex;
+	private Sex sex;
+	private Person andy;
+	private Family family;
+	private Kinship kinship;
 
 	@Autowired
 	private WebApplicationContext webApplicationContext;
@@ -63,6 +64,9 @@ public class PeopleApiApplicationTests {
 
 	@Autowired
 	private PersonRepository personRepository;
+
+	@Autowired
+	private KinshipRepository kinshipRepository;
 
 
 	@Autowired
@@ -84,15 +88,32 @@ public class PeopleApiApplicationTests {
 		alexsAddress = new Address("451 W Wrightwood","United States","Chicago",60614);
 		sex = new Sex(true,false);
 		alex=new Person("Alex","Thornburg",23,sex,"alexthornburg1@gmail.com","740-526-6225",alexsAddress);
+		anotherAddress = new Address("111 Park Drive","United States","St. Clairsville",43950);
+		andy = new Person("Andy","Thornburg",21,sex,"athornbu@unca.edu","740-526-6226",anotherAddress);
+		List<Person> list = new ArrayList<Person>();
+		family = new Family("Thornburg",list);
+		kinship = new Kinship("Brothers",alex,andy,0.01);
+
 	}
 
 	@Test
-	public void createNewPerson(){
+	public void createNew(){
 		try {
 			String payload = json(alex);
 			this.mockMvc.perform(post("/person")
 					.contentType(contentType)
 					.content(payload))
+					.andExpect(status().isCreated());
+			personRepository.save(andy);
+			String anotherPayload = json(family);
+			this.mockMvc.perform(post("/family")
+					.contentType(contentType)
+					.content(anotherPayload))
+					.andExpect(status().isCreated());
+			String kinshipPayload = json(kinship);
+			this.mockMvc.perform(post("/kinship")
+					.contentType(contentType)
+					.content(kinshipPayload))
 					.andExpect(status().isCreated());
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -102,7 +123,7 @@ public class PeopleApiApplicationTests {
 	}
 
 	@Test
-	public void readPerson(){
+	public void readTest(){
 		try {
 			sexRepository.save(sex);
 			addressRepository.save(alexsAddress);
@@ -113,13 +134,23 @@ public class PeopleApiApplicationTests {
 					.andExpect(jsonPath("$.firstName", is(this.alex.getFirstName())))
 					.andExpect(jsonPath("$.lastName", is(this.alex.getLastName())))
 					.andExpect(jsonPath("$.age", is(this.alex.getAge())));
+			familyRepository.save(family);
+			this.mockMvc.perform(get("/family/" + family.getId()))
+					.andExpect(status().isOk())
+					.andExpect(content().contentType(contentType))
+					.andExpect(jsonPath("$.surname", is(this.family.getSurname())));
+			kinshipRepository.save(kinship);
+			this.mockMvc.perform(get("/kinship/" + kinship.getId()))
+					.andExpect(status().isOk())
+					.andExpect(content().contentType(contentType))
+					.andExpect(jsonPath("$.relName", is(this.kinship.getRelName())));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	@Test
-	public void findPersonByFirstName(){
+	public void findTest(){
 		try{
 			sexRepository.save(sex);
 			addressRepository.save(alexsAddress);
@@ -133,7 +164,7 @@ public class PeopleApiApplicationTests {
 	}
 
 	@Test
-	public void updatePerson(){
+	public void updateTest(){
 		try{
 			sexRepository.save(sex);
 			addressRepository.save(alexsAddress);
@@ -144,19 +175,42 @@ public class PeopleApiApplicationTests {
 					.contentType(contentType)
 					.content(payload));
 			assertEquals(personRepository.findById(alex.getId()).getEmail(), "someotheremail@gmail.com");
+
+			familyRepository.save(family);
+			family.setSurname("AnotherLastName");
+			String familyPayload = json(family);
+			this.mockMvc.perform(put("/family/" + family.getId())
+					.contentType(contentType)
+					.content(familyPayload));
+			assertEquals(family.getSurname(),familyRepository.findById(family.getId()).getSurname());
+
+			kinshipRepository.save(kinship);
+			kinship.setRelName("Cousins");
+			String kinshipPayload = json(family);
+			this.mockMvc.perform(put("/kinship/"+kinship.getId())
+					.contentType(contentType)
+					.content(kinshipPayload));
+			assertEquals(kinship.getRelName(),kinshipRepository.findById(kinship.getId()).getRelName());
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
 	}
 
 	@Test
-	public void deletePerson(){
+	public void deleteTest(){
 		try{
 			sexRepository.save(sex);
 			addressRepository.save(alexsAddress);
 			personRepository.save(alex);
 			this.mockMvc.perform(delete("/person/"+alex.getId())).andExpect(status().isOk());
 			assert(personRepository.findById(alex.getId())==null);
+
+			this.mockMvc.perform(delete("/family/"+family.getId())).andExpect(status().isOk());
+			assert(familyRepository.findById(family.getId())==null);
+
+			this.mockMvc.perform(delete("/kinship/"+kinship.getId())).andExpect(status().isOk());
+			assert(kinshipRepository.findById(kinship.getId())==null);
 		}catch (Exception e){
 			e.printStackTrace();
 		}
