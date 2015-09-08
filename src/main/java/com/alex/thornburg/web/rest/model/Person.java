@@ -7,7 +7,7 @@ import javax.persistence.*;
  */
 
 @Entity
-public class Person {
+public class Person implements Comparable{
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
@@ -94,4 +94,19 @@ public class Person {
     }
 
 
+    @Override
+    public int compareTo(Object o) {
+        if(o instanceof Person){
+            Person node = (Person) o;
+            if(node.getId() < this.getId()){
+                return -1;
+            }else if (node.getId() == this.getId()){
+                return 0;
+            }else{
+                return 1;
+            }
+        }else{
+            return -1;
+        }
+    }
 }

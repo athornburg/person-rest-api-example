@@ -15,9 +15,11 @@ public class Family {
     private long id;
     private String surname;
     @OneToMany
-    private List<Person> people;
+    private List<Kinship> people;
 
-    public Family(String surname,List<Person> people){
+    public Family(){}
+
+    public Family(String surname,List<Kinship> people){
         this.surname = surname;
         this.people = people;
     }
@@ -30,11 +32,11 @@ public class Family {
         this.surname = surname;
     }
 
-    public List<Person> getPeople() {
+    public List<Kinship> getPeople() {
         return people;
     }
 
-    public void setPeople(List<Person> people) {
+    public void setPeople(List<Kinship> people) {
         this.people = people;
     }
 

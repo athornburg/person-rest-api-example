@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.util.List;
+
 /**
  * Created by alexthornburg on 9/3/15.
  */
@@ -70,7 +72,7 @@ class PersonEndpointController {
     }
 
     @RequestMapping(value = "/findByFirstName/{firstName}", method = RequestMethod.GET)
-    Person getPerson(@PathVariable String firstName) {
+    List<Person> getPerson(@PathVariable String firstName) {
         return this.personRepository.findByFirstName(firstName);
     }
 

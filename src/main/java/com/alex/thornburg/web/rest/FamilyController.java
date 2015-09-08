@@ -1,11 +1,11 @@
 package com.alex.thornburg.web.rest;
 
 import com.alex.thornburg.web.rest.model.Family;
+import com.alex.thornburg.web.rest.model.Kinship;
 import com.alex.thornburg.web.rest.model.Person;
-import com.alex.thornburg.web.rest.repo.AddressRepository;
-import com.alex.thornburg.web.rest.repo.FamilyRepository;
-import com.alex.thornburg.web.rest.repo.PersonRepository;
-import com.alex.thornburg.web.rest.repo.SexRepository;
+import com.alex.thornburg.web.rest.repo.*;
+import com.alex.thornburg.web.rest.services.GenePathFinder;
+import com.alex.thornburg.web.rest.services.Graph;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by alexthornburg on 9/6/15.
@@ -25,13 +26,15 @@ public class FamilyController {
     private PersonRepository personRepository;
     private SexRepository sexRepository;
     private AddressRepository addressRepository;
+    private KinshipRepository kinshipRepository;
 
     @Autowired
-    public FamilyController(FamilyRepository familyRepository,PersonRepository personRepository,SexRepository sexRepository,AddressRepository addressRepository){
+    public FamilyController(FamilyRepository familyRepository,PersonRepository personRepository,SexRepository sexRepository,AddressRepository addressRepository,KinshipRepository kinshipRepository){
         this.familyRepository = familyRepository;
         this.personRepository = personRepository;
         this.sexRepository = sexRepository;
         this.addressRepository = addressRepository;
+        this.kinshipRepository = kinshipRepository;
     }
 
 
@@ -68,15 +71,29 @@ public class FamilyController {
 
     @RequestMapping(value="/{familyId}",method=RequestMethod.GET)
     Family getFamById(@PathVariable long familyId){
-        return this.getFamById(familyId);
+        return this.familyRepository.findById(familyId);
     }
 
 
-    public void saveTransientDependencies(List<Person> people){
-        for(Person person:people){
-            sexRepository.save(person.getSex());
-            addressRepository.save(person.getAddress());
-            personRepository.save(person);
+    //Just demonstrating the power of handling a family this way.
+    @RequestMapping(value="findShortestGeneVarience/{familyId}/{startPersonId}",method=RequestMethod.GET)
+    Map<Person,Double> getShortestGeneVariance(@PathVariable long startPersonId,@PathVariable long familyId){
+        List<Kinship> kinships = familyRepository.findById(familyId).getPeople();
+        Graph g = new Graph(kinships);
+        GenePathFinder pathFinder = new GenePathFinder(g);
+        return pathFinder.lazy(personRepository.findById(startPersonId));
+    }
+
+
+    public void saveTransientDependencies(List<Kinship> people){
+        for(Kinship person:people){
+            sexRepository.save(person.getOrigin().getSex());
+            sexRepository.save(person.getRelative().getSex());
+            addressRepository.save(person.getOrigin().getAddress());
+            addressRepository.save(person.getRelative().getAddress());
+            personRepository.save(person.getOrigin());
+            personRepository.save(person.getRelative());
+            kinshipRepository.save(person);
         }
     }
 

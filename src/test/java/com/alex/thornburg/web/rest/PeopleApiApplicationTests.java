@@ -82,15 +82,12 @@ public class PeopleApiApplicationTests {
 	@Before
 	public void setup() throws Exception {
 		this.mockMvc = webAppContextSetup(webApplicationContext).build();
-		this.personRepository.deleteAllInBatch();
-		this.sexRepository.deleteAllInBatch();
-		addressRepository.deleteAllInBatch();
 		alexsAddress = new Address("451 W Wrightwood","United States","Chicago",60614);
 		sex = new Sex(true,false);
 		alex=new Person("Alex","Thornburg",23,sex,"alexthornburg1@gmail.com","740-526-6225",alexsAddress);
 		anotherAddress = new Address("111 Park Drive","United States","St. Clairsville",43950);
 		andy = new Person("Andy","Thornburg",21,sex,"athornbu@unca.edu","740-526-6226",anotherAddress);
-		List<Person> list = new ArrayList<Person>();
+		List<Kinship> list = new ArrayList<Kinship>();
 		family = new Family("Thornburg",list);
 		kinship = new Kinship("Brothers",alex,andy,0.01);
 
@@ -157,7 +154,7 @@ public class PeopleApiApplicationTests {
 			personRepository.save(alex);
 			this.mockMvc.perform(get("/person/findByFirstName/" + alex.getFirstName()+"/"))
 					.andExpect(status().isOk())
-					.andExpect(jsonPath("$.firstName", is(alex.getFirstName())));
+					.andExpect(jsonPath("$[0].firstName", is(alex.getFirstName())));
 		}catch (Exception e){
 			e.printStackTrace();
 		}

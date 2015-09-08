@@ -53,8 +53,6 @@ public class KinshipController {
         return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/{kinshipId}",method=RequestMethod.DELETE)
-    void deleteKinship(@PathVariable long kinshipId){kinshipRepository.delete(kinshipId);}
 
     @RequestMapping(value = "/{kinshipId}",method = RequestMethod.PUT)
     Kinship updateKinship(@RequestBody Kinship kinship,@PathVariable long kinshipId){
@@ -64,6 +62,11 @@ public class KinshipController {
         newKin.setRelative(kinship.getRelative());
         kinshipRepository.save(newKin);
         return newKin;
+    }
+
+    @RequestMapping(value = "/{kinshipId}",method = RequestMethod.GET)
+    Kinship getKinship(@PathVariable long kinshipId){
+        return kinshipRepository.findById(kinshipId);
     }
 
     public void saveTransientDependencies(List<Person> people){

@@ -24,6 +24,8 @@ public class Kinship {
         this.relName = relName;
     }
 
+    public Kinship(){}
+
     public String getRelName() {
         return relName;
     }
@@ -62,5 +64,22 @@ public class Kinship {
 
     public void setDnaDifference(double dnaDifference) {
         this.dnaDifference = dnaDifference;
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if(o instanceof Kinship){
+            Kinship compare = (Kinship)o;
+            if(compare.getDnaDifference() == dnaDifference
+                    && compare.getOrigin().equals(origin)
+                    && compare.getRelative().equals(relative)
+                    && compare.getRelName().equals(relName)
+                    && compare.getId() == id){
+                return true;
+            }else{
+                return false;
+            }
+        }
+        return false;
     }
 }
