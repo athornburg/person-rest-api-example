@@ -2,6 +2,16 @@
 ![alt tag](https://travis-ci.org/athornburg/person-rest-api-example.svg?branch=master)
 ###A Simple Rest API of People -- A programming exercise
 
+## Building ##
+	```
+	./gradlew :bootrun
+	```
+
+## Running the Tests ##
+	```
+	./gradlew check
+	```
+
 ## Endpoints ##
   * GET /family/{familyId}
   * POST /family/
