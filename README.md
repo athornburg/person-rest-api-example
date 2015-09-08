@@ -4,14 +4,16 @@
 
 ## Building ##
 ```
-./gradlew :bootrun
+gradle :bootrun
 ```
 
 ## Running the Tests ##
 
 ```
-./gradlew check
+gradle check
 ```
+
+Build with gradle 2.2.1 and java 1.8
 
 ## Endpoints ##
   * GET /family/{familyId}
