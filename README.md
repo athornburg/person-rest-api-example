@@ -3,14 +3,15 @@
 ###A Simple Rest API of People -- A programming exercise
 
 ## Building ##
-	```
-	./gradlew :bootrun
-	```
+```
+./gradlew :bootrun
+```
 
 ## Running the Tests ##
-	```
-	./gradlew check
-	```
+
+```
+./gradlew check
+```
 
 ## Endpoints ##
   * GET /family/{familyId}
